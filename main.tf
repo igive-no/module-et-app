@@ -66,7 +66,7 @@ resource "azurerm_key_vault_access_policy" "admin" {
 # Key Vault Access Policy - Azure DevOps Service Principal
 resource "azurerm_key_vault_access_policy" "policy-sp-devops" {
     key_vault_id = azurerm_key_vault.kv.id
-    tenant_id = var.tenant_id
+    tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = var.devops_oid
 
     secret_permissions = [
