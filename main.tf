@@ -23,30 +23,30 @@ data "azurerm_user_assigned_identity" "identity" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
+  name     = var.resource_group_name
   location = var.location
 }
 
 resource "azurerm_key_vault" "kv" {
-  name = "et-${var.service_name}-${lower(var.environment)}-kv"
-    resource_group_name = azurerm_resource_group.rg.name
-    location = azurerm_resource_group.rg.location
-    sku_name = "standard"
-    tenant_id = data.azurerm_client_config.current.tenant_id
+  name                = "et-${var.service_name}-${lower(var.environment)}-vault"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku_name            = "standard"
+  tenant_id           = data.azurerm_client_config.current.tenant_id
 }
 
 # Key Vault Access Policy - Terraform Service Principal
 resource "azurerm_key_vault_access_policy" "policy-sp-terraform" {
-    key_vault_id = azurerm_key_vault.kv.id
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
+  key_vault_id = azurerm_key_vault.kv.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id
 
-    secret_permissions = [
-        "get",
-        "list",
-        "delete",
-        "set",
-    ]
+  secret_permissions = [
+    "get",
+    "list",
+    "delete",
+    "set",
+  ]
 }
 
 #system developers
@@ -65,43 +65,43 @@ resource "azurerm_key_vault_access_policy" "admin" {
 
 # Key Vault Access Policy - Azure DevOps Service Principal
 resource "azurerm_key_vault_access_policy" "policy-sp-devops" {
-    key_vault_id = azurerm_key_vault.kv.id
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = var.devops_oid
+  key_vault_id = azurerm_key_vault.kv.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = var.devops_oid
 
-    secret_permissions = [
-        "get",
-        "list",
-        "delete",
-        "set",
-    ]
+  secret_permissions = [
+    "get",
+    "list",
+    "delete",
+    "set",
+  ]
 }
 
 # Key Vault Access Policy - Service Identity
 resource "azurerm_key_vault_access_policy" "policy-serviceidentity" {
   key_vault_id = azurerm_key_vault.kv.id
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = data.azurerm_user_assigned_identity.identity.principal_id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_user_assigned_identity.identity.principal_id
 
   secret_permissions = [
-      "get",
-      "list"
+    "get",
+    "list"
   ]
 }
 
 # Application Insights
 resource "azurerm_application_insights" "appinsights" {
-    name = "et-${var.service_name}-${lower(var.environment)}-ai"
-    resource_group_name = azurerm_resource_group.rg.name
-    location = azurerm_resource_group.rg.location
-    application_type = var.app_type
+  name                = "et-${var.service_name}-${lower(var.environment)}-ai"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  application_type    = var.app_type
 }
 
 # Key Vault Secret (Application insights Instrumentation Key)
 resource "azurerm_key_vault_secret" "appinssecret" {
-    name = "ApplicationInsights--InstrumentationKey"
-    key_vault_id = azurerm_key_vault.kv.id
-    value = azurerm_application_insights.appinsights.instrumentation_key
+  name         = "ApplicationInsights--InstrumentationKey"
+  key_vault_id = azurerm_key_vault.kv.id
+  value        = azurerm_application_insights.appinsights.instrumentation_key
 
-    depends_on = [azurerm_key_vault_access_policy.policy-sp-terraform]
+  depends_on = [azurerm_key_vault_access_policy.policy-sp-terraform]
 }
