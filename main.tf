@@ -28,7 +28,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_key_vault" "kv" {
-  name                = "et-${var.service_name}-${lower(var.environment)}-vault"
+  name                = "${var.service_name}-${lower(var.environment)}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku_name            = "standard"
