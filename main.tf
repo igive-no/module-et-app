@@ -16,9 +16,10 @@ data "azurerm_resources" "aks" {
   name = var.aks_name
 }
 
-# Find the identity for the current application
-data "azurerm_user_assigned_identity" "identity" {
+# Create the identity for the current application
+resource "azurerm_user_assigned_identity" "identity" {
   resource_group_name = data.azurerm_resources.aks.resources[0].tags["node-resource-group"]
+  location            = var.location 
   name                = var.identity_name
 }
 
@@ -28,7 +29,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_key_vault" "kv" {
-  name                = "${var.service_name}-${lower(var.environment)}"
+  name                = "${var.service_name}-${lower(var.environment)}-${kv_name_suffix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku_name            = "standard"
@@ -81,7 +82,7 @@ resource "azurerm_key_vault_access_policy" "policy-sp-devops" {
 resource "azurerm_key_vault_access_policy" "policy-serviceidentity" {
   key_vault_id = azurerm_key_vault.kv.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_user_assigned_identity.identity.principal_id
+  object_id    = azurerm_user_assigned_identity.identity.principal_id
 
   secret_permissions = [
     "get",

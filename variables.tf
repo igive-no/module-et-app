@@ -14,6 +14,10 @@ variable "aks_name" {
   
 }
 
+variable "kv_name_suffix" {
+  default="et"
+}
+
 variable "identity_name" {
   
 }
