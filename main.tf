@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">=2.40.0"
+      version = ">=2.63.0"
     }
   }
 }
@@ -19,7 +19,7 @@ data "azurerm_resources" "aks" {
 # Create the identity for the current application
 resource "azurerm_user_assigned_identity" "identity" {
   resource_group_name = data.azurerm_resources.aks.resources[0].tags["node-resource-group"]
-  location            = var.location 
+  location            = var.location
   name                = var.identity_name
 }
 
@@ -90,12 +90,18 @@ resource "azurerm_key_vault_access_policy" "policy-serviceidentity" {
   ]
 }
 
+data "azurerm_log_analytics_workspace" "analytics" {
+  name                = "et-loganalytics"
+  resource_group_name = "et-log-analytics"
+}
+
 # Application Insights
 resource "azurerm_application_insights" "appinsights" {
   name                = "et-${var.service_name}-${lower(var.environment)}-ai"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   application_type    = var.app_type
+  workspace_id        = data.azurerm_log_analytics_workspace.analytics.id
 }
 
 # Key Vault Secret (Application insights Instrumentation Key)
