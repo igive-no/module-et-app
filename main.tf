@@ -43,10 +43,10 @@ resource "azurerm_key_vault_access_policy" "policy-sp-terraform" {
   object_id    = data.azurerm_client_config.current.object_id
 
   secret_permissions = [
-    "get",
-    "list",
-    "delete",
-    "set",
+    "Get",
+    "List",
+    "Delete",
+    "Set",
   ]
 }
 
@@ -57,10 +57,10 @@ resource "azurerm_key_vault_access_policy" "admin" {
   object_id    = "d49bbab7-15fb-45a9-950f-38a0d8b3210e"
 
   secret_permissions = [
-    "get",
-    "list",
-    "delete",
-    "set",
+    "Get",
+    "List",
+    "Delete",
+    "Set",
   ]
 }
 
@@ -71,10 +71,10 @@ resource "azurerm_key_vault_access_policy" "policy-sp-devops" {
   object_id    = var.devops_oid
 
   secret_permissions = [
-    "get",
-    "list",
-    "delete",
-    "set",
+    "Get",
+    "List",
+    "Delete",
+    "Set",
   ]
 }
 
@@ -85,8 +85,8 @@ resource "azurerm_key_vault_access_policy" "policy-serviceidentity" {
   object_id    = azurerm_user_assigned_identity.identity.principal_id
 
   secret_permissions = [
-    "get",
-    "list"
+    "Get",
+    "List"
   ]
 }
 
