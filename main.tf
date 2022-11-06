@@ -47,7 +47,9 @@ resource "azurerm_key_vault_access_policy" "policy-sp-terraform" {
     "List",
     "Delete",
     "Set",
-    "Purge"
+    "Purge",
+    "Recover",
+    "Restore"
   ]
 }
 
