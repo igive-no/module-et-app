@@ -5,3 +5,7 @@ output "azurerm_key_vault" {
 output "azurerm_resource_group" {
   value = azurerm_resource_group.rg
 }
+
+output "identity" {
+  value = azurerm_user_assigned_identity.identity
+}
