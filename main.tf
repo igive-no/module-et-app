@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">=2.72.0"
+      version = ">=3.60.0"
     }
   }
 }
@@ -16,11 +16,25 @@ data "azurerm_resources" "aks" {
   name = var.aks_name
 }
 
+data "azurerm_kubernetes_cluster" "aks-cluster" {
+  name = var.aks_name
+  resource_group_name = data.azurerm_resources.aks.resources[0].resource_group_name
+}
+
 # Create the identity for the current application
 resource "azurerm_user_assigned_identity" "identity" {
   resource_group_name = data.azurerm_resources.aks.resources[0].tags["node-resource-group"]
   location            = var.location
   name                = var.identity_name
+}
+
+resource "azurerm_federated_identity_credential" "federated-identity" {
+  name = "fi-${lower(var.environment)}-${var.service_name}"
+  resource_group_name = data.azurerm_resources.aks.resources[0].tags["node-resource-group"]
+  audience = ["api://AzureADTokenExchange"]
+  issuer = data.azurerm_kubernetes_cluster.aks-cluster.oidc_issuer_url
+  subject = "system:serviceaccount:${var.environment == "test" ? "et-test" : "et-prod"}:sa-${var.service_name}"
+  parent_id = azurerm_user_assigned_identity.identity.id
 }
 
 resource "azurerm_resource_group" "rg" {
