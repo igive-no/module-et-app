@@ -17,7 +17,7 @@ data "azurerm_resources" "aks" {
 }
 
 data "azurerm_kubernetes_cluster" "aks-cluster" {
-  name = var.aks_name
+  name                = var.aks_name
   resource_group_name = data.azurerm_resources.aks.resources[0].resource_group_name
 }
 
@@ -29,12 +29,22 @@ resource "azurerm_user_assigned_identity" "identity" {
 }
 
 resource "azurerm_federated_identity_credential" "federated-identity" {
-  name = "fi-${lower(var.environment)}-${var.service_name}"
+  name                = "fi-${lower(var.environment)}-${var.service_name}"
   resource_group_name = data.azurerm_resources.aks.resources[0].tags["node-resource-group"]
-  audience = ["api://AzureADTokenExchange"]
-  issuer = data.azurerm_kubernetes_cluster.aks-cluster.oidc_issuer_url
-  subject = "system:serviceaccount:${var.environment == "test" ? "et-test" : "et-prod"}:sa-${var.service_name}"
-  parent_id = azurerm_user_assigned_identity.identity.id
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = data.azurerm_kubernetes_cluster.aks-cluster.oidc_issuer_url
+  subject             = "system:serviceaccount:${var.environment == "test" ? "et-test" : "et-prod"}:sa-${var.service_name}"
+  parent_id           = azurerm_user_assigned_identity.identity.id
+}
+
+resource "azurerm_federated_identity_credential" "additional-identities" {
+  for_each            = var.federated_identities
+  name                = "fi-${lower(var.environment)}-${var.service_name}-${each.key}"
+  resource_group_name = data.azurerm_resources.aks.resources[0].tags["node-resource-group"]
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = data.azurerm_kubernetes_cluster.aks-cluster.oidc_issuer_url
+  subject             = "system:serviceaccount:${var.environment == "test" ? "et-test" : "et-prod"}:sa-${each.value}"
+  parent_id           = azurerm_user_assigned_identity.identity.id
 }
 
 resource "azurerm_resource_group" "rg" {

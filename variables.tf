@@ -3,23 +3,27 @@ variable "resource_group_name" {
 }
 
 variable "environment" {
-  
+
 }
 
 variable "service_name" {
-  
+
+}
+
+variable "federated_identities" {
+  default = []
 }
 
 variable "aks_name" {
-  
+
 }
 
 variable "kv_name_suffix" {
-  default="et"
+  default = "et"
 }
 
 variable "identity_name" {
-  
+
 }
 
 variable "location" {
