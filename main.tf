@@ -38,8 +38,8 @@ resource "azurerm_federated_identity_credential" "federated-identity" {
 }
 
 resource "azurerm_federated_identity_credential" "additional-identities" {
-  for_each            = var.federated_identities
-  name                = "fi-${lower(var.environment)}-${var.service_name}-${each.key}"
+  for_each            = toset(var.federated_identities)
+  name                = "fi-${lower(var.environment)}-${var.service_name}-${each.value}"
   resource_group_name = data.azurerm_resources.aks.resources[0].tags["node-resource-group"]
   audience            = ["api://AzureADTokenExchange"]
   issuer              = data.azurerm_kubernetes_cluster.aks-cluster.oidc_issuer_url
