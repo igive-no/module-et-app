@@ -89,6 +89,20 @@ resource "azurerm_key_vault_access_policy" "admin" {
     "Delete",
     "Set",
   ]
+
+  certificate_permissions = [
+    "Update",
+    "List",
+    "ListIssuers",
+    "Get",
+    "GetIssuers",
+    "Delete",
+    "DeleteIssuers",
+    "Purge",
+    "Recover",
+    "Restore",
+    "Import"
+  ]
 }
 
 # Key Vault Access Policy - Azure DevOps Service Principal
@@ -113,6 +127,13 @@ resource "azurerm_key_vault_access_policy" "policy-serviceidentity" {
 
   secret_permissions = [
     "Get",
+    "List"
+  ]
+
+  certificate_permissions = [
+    "Get",
+    "GetIssuers",
+    "ListIssuers",
     "List"
   ]
 }
