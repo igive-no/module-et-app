@@ -103,6 +103,26 @@ resource "azurerm_key_vault_access_policy" "admin" {
     "Restore",
     "Import"
   ]
+
+  key_permissions = [
+    "Create",
+    "Decrypt",
+    "Encrypt",
+    "Delete",
+    "Get",
+    "List",
+    "Update",
+    "Import",
+    "Verify",
+    "Purge",
+    "Recover",
+    "Restore",
+    "Sign",
+    "UnwrapKey",
+    "GetRotationPolicy",
+    "SetRotationPolicy",
+    "Backup"
+  ]
 }
 
 # Key Vault Access Policy - Azure DevOps Service Principal
@@ -135,6 +155,15 @@ resource "azurerm_key_vault_access_policy" "policy-serviceidentity" {
     "GetIssuers",
     "ListIssuers",
     "List"
+  ]
+
+  key_permissions = [
+    "Get",
+    "List",
+    "UnwrapKey",
+    "GetRotationPolicy",
+    "Decrypt",
+    "GetRotationPolicy",
   ]
 }
 
